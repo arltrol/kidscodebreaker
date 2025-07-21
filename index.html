@@ -5,7 +5,7 @@
   <title>Code Breaker Kids</title>
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Comic Sans MS', cursive;
       background: #fef6e4;
       color: #001858;
       text-align: center;
@@ -107,16 +107,6 @@
     const timerEl = document.getElementById("timer");
 
     let timeLeft = 60;
-    const sillyHints = [
-      "Too high!",
-      "Too low!",
-      "Hmm... one of them is right!",
-      "The middle number is correct!",
-      "Nope, but you look cool trying!",
-      "Oops! All wrong — try again, detective!",
-      "You're getting warmer... maybe.",
-      "That combo would open a banana vault!"
-    ];
 
     function incrementDigit(index) {
       digits[index] = (digits[index] + 1) % 10;
@@ -124,15 +114,25 @@
     }
 
     function tryCode() {
-      if (digits[0] === secretCode[0] &&
-          digits[1] === secretCode[1] &&
-          digits[2] === secretCode[2]) {
+      if (digits.join('') === secretCode.join('')) {
         messageEl.innerHTML = "🎉 You cracked it! Treasure unlocked!";
         clearInterval(timerId);
-      } else {
-        const hint = sillyHints[Math.floor(Math.random() * sillyHints.length)];
-        messageEl.innerHTML = `❌ ${hint}`;
+        return;
       }
+
+      let hints = [];
+
+      for (let i = 0; i < 3; i++) {
+        if (digits[i] === secretCode[i]) {
+          hints.push(`Digit ${i + 1} is ✅ correct`);
+        } else if (digits[i] < secretCode[i]) {
+          hints.push(`Digit ${i + 1} is too 🔽 low`);
+        } else {
+          hints.push(`Digit ${i + 1} is too 🔼 high`);
+        }
+      }
+
+      messageEl.innerHTML = `❌ Try again!<br>${hints.join('<br>')}`;
     }
 
     const timerId = setInterval(() => {
@@ -140,7 +140,7 @@
       timerEl.textContent = `Time left: ${timeLeft}s`;
       if (timeLeft <= 0) {
         clearInterval(timerId);
-        messageEl.innerHTML = "⏰ Time's up! The treasure remains locked...";
+        messageEl.innerHTML = `⏰ Time's up! The code was <strong>${secretCode.join('')}</strong>`;
       }
     }, 1000);
   </script>
