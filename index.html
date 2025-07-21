@@ -69,48 +69,61 @@
 </head>
 <body>
   <h1>🔐 Code Breaker Kids 🔓</h1>
-  <p>Can you guess the 3-digit code to unlock the treasure?</p>
+  <p>Can you guess the secret code to unlock the treasure?</p>
 
-  <div class="digits">
-    <div class="digit-control">
-      <div id="digit0" class="digit">0</div>
-      <button onclick="incrementDigit(0)" class="digit-button">+1</button>
-    </div>
-    <div class="digit-control">
-      <div id="digit1" class="digit">0</div>
-      <button onclick="incrementDigit(1)" class="digit-button">+1</button>
-    </div>
-    <div class="digit-control">
-      <div id="digit2" class="digit">0</div>
-      <button onclick="incrementDigit(2)" class="digit-button">+1</button>
-    </div>
-  </div>
+  <!-- NEW: Difficulty Selector -->
+  <label for="codeLength">Select Code Length:</label>
+  <select id="codeLength" onchange="resetGame()">
+    <option value="3" selected>3 digits (easy)</option>
+    <option value="4">4 digits</option>
+    <option value="5">5 digits</option>
+    <option value="6">6 digits (hard)</option>
+  </select>
+
+  <div class="digits" id="digitControls"></div>
 
   <button onclick="tryCode()" class="try-btn">Try Code</button>
   <div class="message" id="message">🕵️‍♀️ What could the secret code be?</div>
   <div class="timer" id="timer">Time left: 60s</div>
 
   <script>
-    const secretCode = [
-      Math.floor(Math.random() * 10),
-      Math.floor(Math.random() * 10),
-      Math.floor(Math.random() * 10)
-    ];
+    let digits = [];
+    let digitEls = [];
+    let secretCode = [];
+    let timerId = null;
+    let timeLeft = 60;
 
-    const digits = [0, 0, 0];
-    const digitEls = [
-      document.getElementById("digit0"),
-      document.getElementById("digit1"),
-      document.getElementById("digit2")
-    ];
+    const digitControls = document.getElementById("digitControls");
     const messageEl = document.getElementById("message");
     const timerEl = document.getElementById("timer");
-
-    let timeLeft = 60;
+    const codeLengthSelect = document.getElementById("codeLength");
 
     function incrementDigit(index) {
       digits[index] = (digits[index] + 1) % 10;
       digitEls[index].textContent = digits[index];
+    }
+
+    function buildUI(length) {
+      digitControls.innerHTML = '';
+      digits = [];
+      digitEls = [];
+      for (let i = 0; i < length; i++) {
+        digits.push(0);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'digit-control';
+        const display = document.createElement('div');
+        display.className = 'digit';
+        display.id = 'digit' + i;
+        display.textContent = '0';
+        digitEls.push(display);
+        const button = document.createElement('button');
+        button.className = 'digit-button';
+        button.textContent = '+1';
+        button.onclick = () => incrementDigit(i);
+        wrapper.appendChild(display);
+        wrapper.appendChild(button);
+        digitControls.appendChild(wrapper);
+      }
     }
 
     function tryCode() {
@@ -122,7 +135,7 @@
 
       let hints = [];
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < digits.length; i++) {
         if (digits[i] === secretCode[i]) {
           hints.push(`Digit ${i + 1} is ✅ correct`);
         } else if (digits[i] < secretCode[i]) {
@@ -135,14 +148,27 @@
       messageEl.innerHTML = `❌ Try again!<br>${hints.join('<br>')}`;
     }
 
-    const timerId = setInterval(() => {
-      timeLeft--;
+    function resetGame() {
+      clearInterval(timerId);
+      timeLeft = 60;
       timerEl.textContent = `Time left: ${timeLeft}s`;
-      if (timeLeft <= 0) {
-        clearInterval(timerId);
-        messageEl.innerHTML = `⏰ Time's up! The code was <strong>${secretCode.join('')}</strong>`;
-      }
-    }, 1000);
+      const length = parseInt(codeLengthSelect.value, 10);
+      secretCode = Array.from({ length }, () => Math.floor(Math.random() * 10));
+      buildUI(length);
+      messageEl.innerHTML = "🕵️‍♀️ What could the secret code be?";
+      timerId = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          messageEl.innerHTML = `⏰ Time's up! The code was <strong>${secretCode.join('')}</strong>`;
+        }
+      }, 1000);
+    }
+
+    // Start with default
+    resetGame();
   </script>
 </body>
+
 </html>
