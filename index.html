@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Code Breaker Kids</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fef6e4;
+      color: #001858;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    .digits {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .digit-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .digit {
+      font-size: 3em;
+      padding: 10px;
+      width: 60px;
+      background: #f3d2c1;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .digit-button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      background: #8bd3dd;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .digit-button:hover {
+      background: #40c0c0;
+    }
+    .try-btn {
+      margin-top: 20px;
+      font-size: 1.5em;
+      padding: 15px 30px;
+      background: #f582ae;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .try-btn:hover {
+      background: #ef476f;
+    }
+    .message {
+      margin-top: 30px;
+      font-size: 1.3em;
+    }
+    .timer {
+      font-size: 1.2em;
+      margin-top: 10px;
+      color: #ff006e;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 Code Breaker Kids 🔓</h1>
+  <p>Can you guess the 3-digit code to unlock the treasure?</p>
+
+  <div class="digits">
+    <div class="digit-control">
+      <div id="digit0" class="digit">0</div>
+      <button onclick="incrementDigit(0)" class="digit-button">+1</button>
+    </div>
+    <div class="digit-control">
+      <div id="digit1" class="digit">0</div>
+      <button onclick="incrementDigit(1)" class="digit-button">+1</button>
+    </div>
+    <div class="digit-control">
+      <div id="digit2" class="digit">0</div>
+      <button onclick="incrementDigit(2)" class="digit-button">+1</button>
+    </div>
+  </div>
+
+  <button onclick="tryCode()" class="try-btn">Try Code</button>
+  <div class="message" id="message">🕵️‍♀️ What could the secret code be?</div>
+  <div class="timer" id="timer">Time left: 60s</div>
+
+  <script>
+    const secretCode = [
+      Math.floor(Math.random() * 10),
+      Math.floor(Math.random() * 10),
+      Math.floor(Math.random() * 10)
+    ];
+
+    const digits = [0, 0, 0];
+    const digitEls = [
+      document.getElementById("digit0"),
+      document.getElementById("digit1"),
+      document.getElementById("digit2")
+    ];
+    const messageEl = document.getElementById("message");
+    const timerEl = document.getElementById("timer");
+
+    let timeLeft = 60;
+    const sillyHints = [
+      "Too high!",
+      "Too low!",
+      "Hmm... one of them is right!",
+      "The middle number is correct!",
+      "Nope, but you look cool trying!",
+      "Oops! All wrong — try again, detective!",
+      "You're getting warmer... maybe.",
+      "That combo would open a banana vault!"
+    ];
+
+    function incrementDigit(index) {
+      digits[index] = (digits[index] + 1) % 10;
+      digitEls[index].textContent = digits[index];
+    }
+
+    function tryCode() {
+      if (digits[0] === secretCode[0] &&
+          digits[1] === secretCode[1] &&
+          digits[2] === secretCode[2]) {
+        messageEl.innerHTML = "🎉 You cracked it! Treasure unlocked!";
+        clearInterval(timerId);
+      } else {
+        const hint = sillyHints[Math.floor(Math.random() * sillyHints.length)];
+        messageEl.innerHTML = `❌ ${hint}`;
+      }
+    }
+
+    const timerId = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Time left: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        messageEl.innerHTML = "⏰ Time's up! The treasure remains locked...";
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
